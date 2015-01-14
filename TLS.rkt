@@ -269,4 +269,69 @@
       (else (cons (car lat)
                   (rempick (sub1 n) (cdr lat)))))))
   
-(rempick 2 '(bip bop bap))
+;(rempick 2 '(bip bop bap))
+
+(define no-nums
+  (lambda (lat)
+    (cond
+      ((null? lat) '())
+      ((number? (car lat)) (no-nums (cdr lat)))
+      (else (cons (car lat)
+                  (no-nums (cdr lat)))))))
+
+;(no-nums '(1 hi "mum" 32 19))
+
+(define all-nums
+  (lambda (lat)
+    (cond
+      ((null? lat) '())
+      ((number? (car lat)) (cons (car lat)
+                                 (all-nums (cdr lat))))
+      (else (all-nums (cdr lat))))))
+
+;(all-nums '(1 hi "mum" 32 19))
+
+(define eqan?
+  (lambda (a1 a2)
+    (cond
+      ((and (number? a1) (number? a2)) (= a1 a2))
+      ((and (atom? a1) (atom? a2)) (eq? a1 a2)))))
+
+;(eqan? 1 'a)
+;(eqan? 1 1)
+;(eqan? 1 2)
+;(eqan? 'a 'a)
+;(eqan? 'a 'b)
+
+(define occur
+  (lambda (a lat)
+    (cond
+      ((null? lat) 0)
+      (else 
+       (cond 
+         ((eqan? a (car lat)) (add1 (occur a (cdr lat))))
+         (else (occur a (cdr lat))))))))
+
+;(occur 1 '(1 2 1 3 1 4 1 5 1))
+
+; mine
+(define one?
+  (lambda (a)
+    (and (number? a) (= 1 a))))
+
+; from book - only supports numbers
+;(define one?
+;  (lambda (a) (= 1 a)))
+
+;(one? 1)
+;(one? 2)
+;(one? 'a)
+
+(define rempick2
+  (lambda (n lat)
+    (cond
+      ((one? n) (cdr lat))
+      (else (cons (car lat)
+                  (rempick2 (sub1 n) (cdr lat)))))))
+    
+(rempick2 2 '(bish bash bop))
