@@ -334,4 +334,45 @@
       (else (cons (car lat)
                   (rempick2 (sub1 n) (cdr lat)))))))
     
-(rempick2 2 '(bish bash bop))
+;(rempick2 2 '(bish bash bop))
+
+(define rember*
+  (lambda (a l)
+    (cond
+      ((null? l) '())
+      ((atom? l) (cond
+                   ((eq? a l) '())
+                   (else l)))
+      ((eq? a (car l)) (rember* a (cdr l)))
+      (else (cons (rember* a (car l))
+                  (rember* a (cdr l)))))))
+
+; book version
+
+;(rember* 'cup 
+;(define rember*
+;  (lambda (a l)
+;    (cond
+;      ((null? l) '())
+;      ((atom? (car l)) (cond
+;                   ((eq? a (car l)) (rember* a (cdr l)))
+;                   (else (cons (car l)
+;                               (rember* a (cdr l))))))
+;      (else (cons (rember* a (car l))
+;                  (rember* a (cdr l)))))))
+
+;(rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
+
+; not working: 
+(define insertR*
+  (lambda (new old l)
+    (cond
+      ((null? l) '())
+      ((atom? (car l)) (cond
+                   ((eq? old (car l)) (cons (cons (car l) new) (insertR* new old (cdr l))))
+                   (else (cons (car l)
+                               (insertR* new old (cdr l))))))
+      (else (cons (insertR* new old (car l))
+                  (insertR* new old (cdr l)))))))
+
+(insertR 'roast 'chuck '((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood))
