@@ -336,6 +336,8 @@
     
 ;(rempick2 2 '(bish bash bop))
 
+; my version - more concise, but 4 top-level questions.  Seems like an optimisation of the book version.
+
 (define rember*
   (lambda (a l)
     (cond
@@ -363,16 +365,87 @@
 
 ;(rember* 'cup '((coffee) cup ((tea) cup) (and (hick)) cup))
 
-; not working: 
 (define insertR*
   (lambda (new old l)
     (cond
       ((null? l) '())
       ((atom? (car l)) (cond
-                   ((eq? old (car l)) (cons (cons (car l) new) (insertR* new old (cdr l))))
-                   (else (cons (car l)
-                               (insertR* new old (cdr l))))))
+                         ((eq? old (car l)) (cons old 
+                                                  (cons new 
+                                                        (insertR* new old (cdr l)))))
+                         (else (cons (car l)
+                                     (insertR* new old (cdr l))))))
       (else (cons (insertR* new old (car l))
                   (insertR* new old (cdr l)))))))
 
-(insertR 'roast 'chuck '((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood))
+;(insertR* 'roast 'chuck '((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood))
+
+(define occur*
+  (lambda (a l)
+    (cond
+      ((null? l) 0)
+      ((atom? (car l)) (cond
+                         ((eq? a (car l)) (add1 (occur* a (cdr l))))
+                         (else (occur* a (cdr l)))))
+      (else (+ (occur* a (car l))
+               (occur* a (cdr l)))))))
+
+;(occur* 'banana '((banana)(split((((banana ice)))(cream(banana))sherbet))(banana)(bread)(banana brandy)))
+
+(define subst*
+  (lambda (new old l)
+    (cond
+      ((null? l) '())
+      ((atom? (car l)) (cond
+                         ((eq? old (car l)) (cons new 
+                                                  (subst* new old (cdr l))))
+                         (else (cons (car l)
+                                     (subst* new old (cdr l))))))
+      (else (cons (subst* new old (car l))
+                  (subst* new old (cdr l)))))))
+
+;(subst* 'orange 'banana '((banana)(split((((banana ice)))(cream(banana))sherbet))(banana)(bread)(banana brandy)))
+
+(define insertL*
+  (lambda (new old l)
+    (cond
+      ((null? l) '())
+      ((atom? (car l)) (cond
+                         ((eq? old (car l)) (cons new 
+                                                  (cons old 
+                                                        (insertL* new old (cdr l)))))
+                         (else (cons (car l)
+                                     (insertL* new old (cdr l))))))
+      (else (cons (insertL* new old (car l))
+                  (insertL* new old (cdr l)))))))
+
+;(insertL* 'pecker 'chuck '((how much (wood)) could ((a (wood) chuck)) (((chuck))) (if (a) ((wood chuck))) could chuck wood))
+
+; my version - extra conditionals more complicated than plain logic of book version
+
+;(define member*
+;  (lambda (a l)
+;    (cond
+;      ((null? l) #f)
+;      ((atom? (car l)) (cond
+;                         ((eq? a (car l)) #t)
+;                         (else (member* a (cdr l)))))
+;      (else (cond 
+;              ((member* a (car l)) #t)
+;              (else (member* a (cdr l))))))))
+
+; book version
+
+(define member*
+  (lambda (a l)
+    (cond
+      ((null? l) #f)
+      ((atom? (car l)) (or
+                         (eq? a (car l))
+                         (member* a (cdr l))))
+      (else (or 
+              (member* a (car l))
+              (member* a (cdr l)))))))
+
+(member* 'chips '((potato)(chips((with)fish)(chips))))
+(member* 'peas '((potato)(chips((with)fish)(chips))))
