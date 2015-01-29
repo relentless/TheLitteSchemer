@@ -490,21 +490,59 @@
 ;                  (eqlist? (cdr l1) (cdr l2)))))))
 
 ; Let's try for 9 top-level conditions!
-; Yes! Exactly like book.  Seems a bit unnecessary though, doesn't even use basic 
+; Yes! Exactly like book.  Seems a bit unnecessary though, doesn't use even basic 
 ; optimisations of logic.
+;(define eqlist?
+;  (lambda (l1 l2)
+;     (cond
+;       ((and (null? l1) (null? l2)) #t)
+;       ((and (null? l1) (atom? (car l2))) #f)
+;       ((null? l1) #f)
+;       ((and (atom? (car l1)) (null? l2)) #f)
+;       ((and (atom? (car l1))(atom? (car l2))) (and (eqan? (car l1) (car l2))
+;                                                    (eqlist? (cdr l1) (cdr l2))))
+;       ((atom? (car l1)) #f)
+;       ((null? l2) #f)
+;       ((atom? (car l2)) #f)
+;       (else (and (eqlist? (car l1) (car l2))
+;                  (eqlist? (cdr l1) (cdr l2)))))))
+       
+;(eqlist? '(strawberry cream ice) '(strawberry ice cream))
+;(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
+;(eqlist? '(beef ((salami)) (and (soda))) '(beef ((sausage)) (and (soda))))
+
+; original
+
+;(define equal?
+;  (lambda (s1 s2)
+;    (cond
+;      ((and (atom? s1) (atom? s2)) (eqan? s1 s2))
+;      ((atom? s1) #f)
+;      ((atom? s2) #f)
+;      (else (eqlist? s1 s2)))))
+
+; simplified
+
+(define equal?
+  (lambda (s1 s2)
+    (cond
+      ((and (atom? s1) (atom? s2)) (eqan? s1 s2))
+      ((or (atom? s1) (atom? s2)) #f)
+      (else (eqlist? s1 s2)))))
+
+;(equal? 'a 'a)
+;(equal? 'a 'b)
+;(equal? '() '())
+;(equal? '(1 2 3) '(3 2 1))
+;(equal? '(1 2 3) '(1 2 3))
+
+; eqlist? using equal?
 (define eqlist?
   (lambda (l1 l2)
      (cond
        ((and (null? l1) (null? l2)) #t)
-       ((and (null? l1) (atom? (car l2))) #f)
-       ((null? l1) #f)
-       ((and (atom? (car l1)) (null? l2)) #f)
-       ((and (atom? (car l1))(atom? (car l2))) (and (eqan? (car l1) (car l2))
-                                                    (eqlist? (cdr l1) (cdr l2))))
-       ((atom? (car l1)) #f)
-       ((null? l2) #f)
-       ((atom? (car l2)) #f)
-       (else (and (eqlist? (car l1) (car l2))
+       ((or (null? l1) (null? l2)) #f)
+       (else (and (equal? (car l1) (car l2))
                   (eqlist? (cdr l1) (cdr l2)))))))
        
 (eqlist? '(strawberry cream ice) '(strawberry ice cream))
