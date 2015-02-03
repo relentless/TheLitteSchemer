@@ -545,6 +545,22 @@
        (else (and (equal? (car l1) (car l2))
                   (eqlist? (cdr l1) (cdr l2)))))))
        
-(eqlist? '(strawberry cream ice) '(strawberry ice cream))
-(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
-(eqlist? '(beef ((salami)) (and (soda))) '(beef ((sausage)) (and (soda))))
+;(eqlist? '(strawberry cream ice) '(strawberry ice cream))
+;(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
+;(eqlist? '(beef ((salami)) (and (soda))) '(beef ((sausage)) (and (soda))))
+
+(define numbered?
+  (lambda (exp)
+    (cond
+      ((atom? exp) (number? exp))
+      ((null? exp) #t)
+      ((eq? (car (cdr exp)) '*) (and (numbered? (car exp))
+                                     (numbered? (car (cdr (cdr exp))))))
+      ((eq? (car (cdr exp)) '+) (and (numbered? (car exp))
+                                     (numbered? (car (cdr (cdr exp))))))
+      ((eq? (car (cdr exp)) '^) (and (numbered? (car exp))
+                                     (numbered? (car (cdr (cdr exp)))))))))
+      
+;(numbered? '1)
+;(numbered? 'hi)
+;(numbered? '((1 + 1) ^ (2 * (3 ^ 4))))
