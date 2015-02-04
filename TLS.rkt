@@ -619,7 +619,37 @@
       ((eq? (operator exp) '^) (pow (value3 (1st-sub-exp exp))
                                (value3 (2nd-sub-exp exp)))))))
 
-(value3 '(^ 2 4))
-(value3 '(+ 2 4))
-(value3 '(* 2 4))
-(value3 '(^ (+ 1 1) (* 2 (+ 3 4))))
+;(value3 '(^ 2 4))
+;(value3 '(+ 2 4))
+;(value3 '(* 2 4))
+;(value3 '(^ (+ 1 1) (* 2 (+ 3 4))))
+
+(define zero^?
+  (lambda (n)
+    (eq? n '())))
+
+;(zero^? '())
+;(zero^? '(()))
+
+(define add1^
+  (lambda (n)
+    (cons '() n)))
+
+;(add1^ '())
+;(add1^ '(()))
+;(add1^ '(() ()))
+
+(define sub1^
+  (lambda (n)
+    (cdr n)))
+
+;(sub1^ '(() ()) )
+;(sub1^ '(()) )
+
+(define +^
+  (lambda (m n)
+    (cond
+      ((zero^? m) n)
+      (else (+^ (sub1^ m) (add1^ n))))))
+
+;(+^ '(()()) '(()()()))
