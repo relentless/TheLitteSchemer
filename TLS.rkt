@@ -553,7 +553,6 @@
   (lambda (exp)
     (cond
       ((atom? exp) (number? exp))
-      ((null? exp) #t)
       ((eq? (car (cdr exp)) '*) (and (numbered? (car exp))
                                      (numbered? (car (cdr (cdr exp))))))
       ((eq? (car (cdr exp)) '+) (and (numbered? (car exp))
@@ -564,3 +563,63 @@
 ;(numbered? '1)
 ;(numbered? 'hi)
 ;(numbered? '((1 + 1) ^ (2 * (3 ^ 4))))
+
+(define value
+  (lambda (exp)
+    (cond
+      ((atom? exp) exp)
+      ((eq? (car (cdr exp)) '*) (* (value (car exp))
+                                     (value (car (cdr (cdr exp))))))
+      ((eq? (car (cdr exp)) '+) (+ (value (car exp))
+                                     (value (car (cdr (cdr exp))))))
+      ((eq? (car (cdr exp)) '^) (pow (value (car exp))
+                                     (value (car (cdr (cdr exp)))))))))
+
+;(value '(2 ^ 4))
+;(value '(2 + 4))
+;(value '(2 * 4))
+;(value '((1 + 1) ^ (2 * (3 + 4))))
+
+(define value2
+  (lambda (exp)
+    (cond
+      ((atom? exp) exp)
+      ((eq? (car exp) '*) (* (value2 (car (cdr exp)))
+                             (value2 (car (cdr (cdr exp))))))
+      ((eq? (car exp) '+) (+ (value2 (car (cdr exp)))
+                             (value2 (car (cdr (cdr exp))))))
+      ((eq? (car exp) '^) (pow (value2 (car (cdr exp)))
+                               (value2 (car (cdr (cdr exp)))))))))
+
+;(value2 '(^ 2 4))
+;(value2 '(+ 2 4))
+;(value2 '(* 2 4))
+;(value2 '(^ (+ 1 1) (* 2 (+ 3 4))))
+
+(define 1st-sub-exp
+  (lambda (exp)
+    (car (cdr exp))))
+
+(define 2nd-sub-exp
+  (lambda (exp)
+    (car (cdr (cdr exp)))))
+
+(define operator
+  (lambda (exp)
+    (car exp)))
+
+(define value3
+  (lambda (exp)
+    (cond
+      ((atom? exp) exp)
+      ((eq? (operator exp) '*) (* (value3 (1st-sub-exp exp))
+                             (value3 (2nd-sub-exp exp))))
+      ((eq? (operator exp) '+) (+ (value3 (1st-sub-exp exp))
+                             (value3 (2nd-sub-exp exp))))
+      ((eq? (operator exp) '^) (pow (value3 (1st-sub-exp exp))
+                               (value3 (2nd-sub-exp exp)))))))
+
+(value3 '(^ 2 4))
+(value3 '(+ 2 4))
+(value3 '(* 2 4))
+(value3 '(^ (+ 1 1) (* 2 (+ 3 4))))
