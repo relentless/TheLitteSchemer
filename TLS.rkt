@@ -679,12 +679,50 @@
 ;              (else (cons (car lat) (makeset (cdr lat)))))))))
 
 ; simpler version:
+;(define makeset
+;  (lambda (lat)
+;    (cond
+;      ((null? lat) '())
+;      ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
+;      (else (cons (car lat) (makeset (cdr lat)))))))
+
+; with multirember:
+
+; This is basically the same as my first version, but simplified.
+; Use of Rember vs Multirember doesn't seem to make a difference.
+
 (define makeset
   (lambda (lat)
     (cond
       ((null? lat) '())
-      ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
-      (else (cons (car lat) (makeset (cdr lat)))))))
+      (else (cons (car lat) 
+                  (multirember (car lat) (makeset (cdr lat))))))))
 
-(makeset '(apple peach pear peach plum apple lemon peach))
+;(makeset '(apple peach pear peach plum apple apple lemon peach))
 
+;(define subset?
+;  (lambda (set1 set2)
+;    (cond
+;      ((null? set1) #t)
+;      (else (and (member? (car set1) set2)
+;                 (subset? (cdr set1) set2))))))
+
+; shorter version
+
+(define subset?
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) #t)
+      ((member? (car set1) set2) (subset? (cdr set1) set2))
+      (else #f))))
+
+;(subset? '(5 chicken wings) '(5 hamburgers 2 pieces fried chicken and light duckling wings))
+;(subset? '(4 pounds of horseradish) '(four pounds chicken and 5 ounces horseradish))
+
+(define eqset?
+  (lambda (set1 set2)
+    (and (subset? set1 set2)
+         (subset? set2 set1))))
+
+(eqset? '(6 large chickens with wings) '(6 large chickens with wings))
+(eqset? '(6 large chickens with wings) '(6 large chicken wings))
