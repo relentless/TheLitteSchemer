@@ -653,3 +653,15 @@
       (else (+^ (sub1^ m) (add1^ n))))))
 
 ;(+^ '(()()) '(()()()))
+
+(define set?
+  (lambda (lat)
+    (cond
+      ((null? lat) #t)
+      ((member? (car lat) (cdr lat)) #f)
+      (else (set? (cdr lat))))))
+
+(set? '(apples pears cider))
+(set? '())
+(set? '(apples pears apples))
+(set? '(pears apples apples))
