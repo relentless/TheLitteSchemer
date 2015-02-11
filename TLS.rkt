@@ -661,7 +661,30 @@
       ((member? (car lat) (cdr lat)) #f)
       (else (set? (cdr lat))))))
 
-(set? '(apples pears cider))
-(set? '())
-(set? '(apples pears apples))
-(set? '(pears apples apples))
+;(set? '(apples pears cider))
+;(set? '())
+;(set? '(apples pears apples))
+;(set? '(pears apples apples))
+
+; works properly, but book used simpler version which didn't bother maintaining the order
+; (which is probably what you really want with a set)
+
+;(define makeset
+;  (lambda (lat)
+;    (cond
+;      ((null? lat) '())
+;      (else (cond 
+;              ((member? (car lat) (cdr lat)) (cons (car lat) 
+;                                                   (rember (car lat) (makeset (cdr lat)))))
+;              (else (cons (car lat) (makeset (cdr lat)))))))))
+
+; simpler version:
+(define makeset
+  (lambda (lat)
+    (cond
+      ((null? lat) '())
+      ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
+      (else (cons (car lat) (makeset (cdr lat)))))))
+
+(makeset '(apple peach pear peach plum apple lemon peach))
+
