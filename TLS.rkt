@@ -724,5 +724,93 @@
     (and (subset? set1 set2)
          (subset? set2 set1))))
 
-(eqset? '(6 large chickens with wings) '(6 large chickens with wings))
-(eqset? '(6 large chickens with wings) '(6 large chicken wings))
+;(eqset? '(6 large chickens with wings) '(6 large chickens with wings))
+;(eqset? '(6 large chickens with wings) '(6 large chicken wings))
+
+;(define intersect?
+;  (lambda (set1 set2)
+;    (cond
+;      ((null? set1) #f)
+;      ((member? (car set1) set2) #t)
+;      (else (intersect? (cdr set1) set2)))))
+
+(define intersect?
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) #f)
+      (else (or (member? (car set1) set2)
+                (intersect? (cdr set1) set2))))))
+
+;(intersect?'(stewed tomatoes and macaroni) '(macaroni and cheese))
+;(intersect?'(stewed tomatoes and macaroni) '(mac n cheese))
+
+(define intersect
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) '())
+      ((member? (car set1) set2) (cons (car set1)
+                                       (intersect (cdr set1) set2)))
+      (else (intersect (cdr set1) set2)))))
+
+;(intersect '(stewed tomatoes and macaroni) '(macaroni and cheese))
+;(intersect '(stewed tomatoes and macaroni) '(mac n cheese))
+
+(define union
+  (lambda (set1 set2)
+    (cond
+      ((null? set1) set2)
+      ((member? (car set1) set2) (union (cdr set1) set2))
+      (else (cons (car set1)
+                  (union (cdr set1) set2))))))
+
+;(union '(stewed tomatoes and macaroni casserole) '(macaroni and cheese))
+
+;(define intersectall
+;  (lambda (lset)
+;    (cond
+;      ((equal? (cdr lset) '()) '())
+;      (else (union (intersect (car lset) (cadr lset))
+;                   (intersectall (cdr lset)))))))
+
+; book version, which is better
+
+(define intersectall
+  (lambda (lset)
+    (cond
+      ((null? (cdr lset)) (car lset))      
+      (else (intersect (car lset) (intersectall (cdr lset)))))))
+                
+     
+;(intersectall '((6 pears and)(3 peaches and 6 peppers)(8 pears and 6 plums)(and 6 prunes with some apples)))
+
+(define a-pair?
+  (lambda (l)
+    (eq? (length l) 2)))
+
+;(a-pair? '(1 2))
+;(a-pair? '(1))
+;(a-pair? '((1) (2 3)))
+
+(define first
+  (lambda (p)
+     (car p)))
+
+(define second
+  (lambda (p)
+     (car (cdr p))))
+
+
+(define build
+  (lambda (s1 s2)
+     (cons s1 (cons s2 '()))))
+
+;(define p1 (build 1 2))
+;(first p1)
+;(second p1)
+
+(define fun?
+  (lambda (l)
+    (set? (firsts l))))
+
+(fun? '((1 2)(3 4)(5 6)))
+(fun? '((1 2)(2 1)(1 2)))
