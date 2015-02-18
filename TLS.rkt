@@ -812,5 +812,35 @@
   (lambda (l)
     (set? (firsts l))))
 
-(fun? '((1 2)(3 4)(5 6)))
-(fun? '((1 2)(2 1)(1 2)))
+;(fun? '((1 2)(3 4)(5 6)))
+;(fun? '((1 2)(2 1)(1 2)))
+
+; just consing things - creates some kind of pair type instead of lists,
+; as no empty element at the end (prints as (8.a)
+
+;(define revrel
+;  (lambda (rel)
+;    (cond
+;      ((null? rel) '())
+;      (else (cons (cons (cdr (car rel))
+;                        (car (car rel))) 
+;                  (revrel (cdr rel)))))))
+
+; using build
+(define revrel
+  (lambda (rel)
+    (cond
+      ((null? rel) '())
+      (else (cons (build (cdr (car rel))
+                         (car (car rel))) 
+                  (revrel (cdr rel)))))))
+
+(revrel '((8 a)(pumpkin pie)(got sick)))
+
+; so such function as seconds!
+(define fullfun?
+  (lambda (l)
+    (set? (seconds l))))
+
+(fullfun? '((1 2)(1 4)(1 6)))
+(fullfun? '((1 2)(2 1)(1 2)))
