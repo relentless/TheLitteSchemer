@@ -835,12 +835,20 @@
                          (car (car rel))) 
                   (revrel (cdr rel)))))))
 
-(revrel '((8 a)(pumpkin pie)(got sick)))
+;(revrel '((8 a)(pumpkin pie)(got sick)))
 
-; so such function as seconds!
+
+(define seconds
+  (lambda (l)
+    (cond
+      ((null? l) '())
+      (else (cons (car (cdr (car l)))
+                  (seconds (cdr l)))))))
+
 (define fullfun?
   (lambda (l)
     (set? (seconds l))))
 
-(fullfun? '((1 2)(1 4)(1 6)))
-(fullfun? '((1 2)(2 1)(1 2)))
+;(fullfun? '((1 2)(1 4)(1 6)))
+;(fullfun? '((1 2)(2 1)(1 2)))
+
