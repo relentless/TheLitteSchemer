@@ -852,3 +852,101 @@
 ;(fullfun? '((1 2)(1 4)(1 6)))
 ;(fullfun? '((1 2)(2 1)(1 2)))
 
+(define rember-f
+  (lambda (test? a lat)
+    (cond
+      ((null? lat) '())
+      ((test? (car lat) a) (cdr lat))
+      (else (cons (car lat) 
+                  (rember-f test? a (cdr lat)))))))
+
+;(rember-f = 5 '(6 2 5 3))
+;(rember-f eq? 'jelly '(jelly beans are good))
+
+(define schonfeq?
+  (lambda (a)
+    (lambda (x)
+      (eq? x a))))
+
+;((schonfeq? 'a) 'b)
+;((schonfeq? 'a) 'a)
+
+(define schonfrember
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+        ((null? lat) '())
+        ((test? (car lat) a) (cdr lat))
+        (else (cons (car lat) 
+                    ((schonfrember test?) a (cdr lat))))))))
+
+;((schonfrember eq?) 'b '(a b c))
+
+(define schonfrertL 
+  (lambda (test?)
+    (lambda (new old lat)
+      (cond
+        ((null? lat) '())
+        ((test? (car lat) old) (cons new 
+                                     (cons old 
+                                           (cdr lat))))
+        (else (cons (car lat) 
+                    ((schonfrertL test?) new old (cdr lat))))))))
+  
+;((schonfrertL eq?) 2 3 '(1 3 4))
+  
+(define schonfrertR 
+  (lambda (test?)
+    (lambda (new old lat)
+      (cond
+        ((null? lat) '())
+        ((test? (car lat) old) (cons old
+                                   (cons new 
+                                         (cdr lat))))
+        (else (cons (car lat) 
+                    ((schonfrertR test?) new old (cdr lat))))))))
+  
+;((schonfrertR eq?) 3 2 '(1 2 4))
+
+; initial try at insert-g.  Correct, but book keep (cdr lat) in the main function insead of making 
+; the 'replacement' function do it
+;(define insert-g 
+;  (lambda (replacement)
+;    (lambda (new old lat)
+;      (cond
+;        ((null? lat) '())
+;        ((eq? (car lat) old) (replacement new old lat))
+;        (else (cons (car lat) 
+;                    ((insert-g replacement) new old (cdr lat))))))))
+
+;((insert-g (lambda (new old lat) (cons new (cons old (cdr lat))))) 2 3 '(1 3 4)) ; like insertL
+;((insert-g (lambda (new old lat) (cons old (cons new (cdr lat))))) 3 2 '(1 2 4)) ; insertR
+
+(define seqL
+  (lambda (new old l)
+     (cons new (cons old l))))
+
+(define seqR
+  (lambda (new old l)
+     (cons old (cons new l))))
+
+(define insert-g 
+  (lambda (replacement)
+    (lambda (new old lat)
+      (cond
+        ((null? lat) '())
+        ((eq? (car lat) old) (replacement new old (cdr lat)))
+        (else (cons (car lat) 
+                    ((insert-g replacement) new old (cdr lat))))))))
+
+;((insert-g seqL) 2 3 '(1 3 4))
+;((insert-g seqR) 3 2 '(1 2 4))
+
+(define seqSub
+  (lambda (new old l)
+     (cons new l)))
+
+(define subst-g (insert-g seqSub))
+
+;(subst-g 'c 'd '(a b d))
+
