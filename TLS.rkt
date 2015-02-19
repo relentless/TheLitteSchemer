@@ -950,3 +950,39 @@
 
 ;(subst-g 'c 'd '(a b d))
 
+(define atom-to-function
+  (lambda (x)
+    (cond
+      ((eq? x '*) *)
+      ((eq? x '+) +)
+      (else pow))))
+
+
+(define operator2
+  (lambda (exp)
+    (car (cdr exp))))
+
+(define value-f
+  (lambda (exp)
+    (cond
+      ((atom? exp) exp)
+      (else ((atom-to-function (operator2 exp)) 
+              (value-f (car exp))
+              (value-f (car (cdr (cdr exp)))))))))
+ 
+;(value-f '(2 ^ 4))
+;(value-f '(2 + 4))
+;(value-f '(2 * 4))
+;(value-f '((1 + 1) ^ (2 * (3 + 4))))
+
+(define multirember-f
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+        ((null? lat) '())
+        ((test? (car lat) a) ((multirember-f test?) a (cdr lat)))
+        (else (cons (car lat) 
+                    ((multirember-f test?) a (cdr lat))))))))
+
+((multirember-f eq?) 1 '(1 2 1 3 1 4 1))
+
