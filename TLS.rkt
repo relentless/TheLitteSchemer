@@ -984,5 +984,62 @@
         (else (cons (car lat) 
                     ((multirember-f test?) a (cdr lat))))))))
 
-((multirember-f eq?) 1 '(1 2 1 3 1 4 1))
+;((multirember-f eq?) 1 '(1 2 1 3 1 4 1))
 
+; my version
+(define eq-tuna?
+  (lambda (a)
+    (eq? a 'tuna)))
+
+; book one - uses previously defined function
+(define eq-tuna?2
+    (schonfeq? 'tuna))
+
+; my version
+;(define multiremberT
+;  (lambda (test?)
+;    (lambda (lat)
+;      (cond
+;        ((null? lat) '())
+;        ((test? (car lat)) ((multiremberT test?) (cdr lat)))
+;        (else (cons (car lat) 
+;                    ((multiremberT test?) (cdr lat))))))))
+
+; book version - single lambda
+(define multiremberT
+  (lambda (test? lat)
+    (cond
+      ((null? lat) '())
+      ((test? (car lat)) (multiremberT test? (cdr lat)))
+      (else (cons (car lat) 
+                  (multiremberT test? (cdr lat)))))))
+
+;(multiremberT eq-tuna? '(tuna fish tuna fish swiming in the water))
+
+(define multiinsertL
+  (lambda (new old lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) old)
+        (cons new
+             (cons old
+                   (multiinsertL new old (cdr lat)))))
+      (else (cons (car lat)
+                  (multiinsertL new old (cdr lat)))))))
+
+;(multiinsertL 'bob 'jim '(jim joe and jim jack went to see jim jim))
+
+(define multiinsertLR
+  (lambda (new oldL oldR lat)
+    (cond
+      ((null? lat) '())
+      ((eq? (car lat) oldL) (cons new
+                                 (cons oldL
+                                       (multiinsertLR new oldL oldR (cdr lat)))))
+      ((eq? (car lat) oldR) (cons oldR
+                                 (cons new
+                                       (multiinsertLR new oldL oldR (cdr lat)))))
+      (else (cons (car lat)
+                  (multiinsertLR new oldL oldR (cdr lat)))))))
+
+(multiinsertLR 'bob 'junior 'jim '(jim joe junior and jim jack junior went to see jim jim junior))
