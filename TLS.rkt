@@ -12,6 +12,10 @@
 ;(atom? '(1 2 3))
 ;(atom? (quote ()))
 
+; *********************
+; ***** Chapter 1 *****
+; *********************
+
 ; CAR is defined only for non-empty lists
 
 ;(car '(1 2 3))
@@ -44,6 +48,10 @@
 ;(eq? 1 2); not really a valid question, but gives #f
 ;(eq? '(1 2) '(1 2))
 
+; *********************
+; ***** Chapter 2 *****
+; *********************
+
 (define (lat? x)
   (cond
     ((null? x) #t)
@@ -64,6 +72,10 @@
 ;(member? 1 '(1 2 3))
 ;(member? 2 '(1 2 3))
 ;(member? 1 'a); not valid
+
+; *********************
+; ***** Chapter 3 *****
+; *********************
 
 (define (rember a lat)
   (cond
@@ -126,6 +138,10 @@
                   (multirember a (cdr lat)))))))
 
 ;(multirember 1 '(1 2 1 3 1 4 1))
+
+; *********************
+; ***** Chapter 4 *****
+; *********************
 
 (define add1
   (lambda (n)
@@ -335,6 +351,10 @@
                   (rempick2 (sub1 n) (cdr lat)))))))
     
 ;(rempick2 2 '(bish bash bop))
+
+; *********************
+; ***** Chapter 5 *****
+; *********************
 
 ; my version - more concise, but 4 top-level questions.  Seems like an optimisation of the book version.
 
@@ -549,6 +569,10 @@
 ;(eqlist? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
 ;(eqlist? '(beef ((salami)) (and (soda))) '(beef ((sausage)) (and (soda))))
 
+; *********************
+; ***** Chapter 6 *****
+; *********************
+
 (define numbered?
   (lambda (exp)
     (cond
@@ -653,6 +677,10 @@
       (else (+^ (sub1^ m) (add1^ n))))))
 
 ;(+^ '(()()) '(()()()))
+
+; *********************
+; ***** Chapter 7 *****
+; *********************
 
 (define set?
   (lambda (lat)
@@ -852,6 +880,10 @@
 ;(fullfun? '((1 2)(1 4)(1 6)))
 ;(fullfun? '((1 2)(2 1)(1 2)))
 
+; *********************
+; ***** Chapter 8 *****
+; *********************
+
 (define rember-f
   (lambda (test? a lat)
     (cond
@@ -1042,4 +1074,60 @@
       (else (cons (car lat)
                   (multiinsertLR new oldL oldR (cdr lat)))))))
 
-(multiinsertLR 'bob 'junior 'jim '(jim joe junior and jim jack junior went to see jim jim junior))
+;(multiinsertLR 'bob 'junior 'jim '(jim joe junior and jim jack junior went to see jim jim junior))
+
+(define multiinsertLR&co
+  (lambda (new oldL oldR lat col)
+    (cond
+      ((null? lat) (col '() 0 0))
+      ((eq? (car lat) oldL) 
+        (multiinsertLR&co new oldL oldR (cdr lat) (lambda (newlat lc rc) (col (cons new (cons oldL newlat)) (add1 lc) rc))))
+      ((eq? (car lat) oldR) 
+        (multiinsertLR&co new oldL oldR (cdr lat) (lambda (newlat lc rc) (col (cons oldR (cons new newlat)) lc (add1 rc)))))
+      (else
+        (multiinsertLR&co new oldL oldR (cdr lat) (lambda (newlat lc rc) (col (cons (car lat) newlat) lc rc)))))))
+
+
+;(define (printlist lat lc rc) lat)
+;(define (counts lat lc rc) (list 'left lc 'right rc))
+;(multiinsertLR&co 'salty 'fish 'chips '(chips and fish or fish and chips) counts)
+
+(define even? (lambda (n) (= (modulo n 2) 0)))
+
+(define evens-only*
+  (lambda (l)
+    (cond
+      ((null? l) '())
+      ((atom? (car l))
+        (cond
+          ((even? (car l)) (cons (car l)
+                                 (evens-only* (cdr l))))
+          (else (evens-only* (cdr l)))))
+      (else (cons (evens-only* (car l))
+                  (evens-only* (cdr l)))))))
+       
+;(evens-only* '((9 1 2 8) 3 10 ((9 9) 7 6) 2))
+
+; this is getting hard
+(define evens-only*&co
+  (lambda (l col)
+    (cond
+      ((null? l) (col '() 1 0))
+      ((atom? (car l))
+        (cond
+          ((even? (car l)) 
+            (evens-only*&co (cdr l) (lambda (newl evenP oddS) (col (cons (car l) newl) (* (car l) evenP) oddS))))
+          (else 
+            (evens-only*&co (cdr l) (lambda (newl evenP oddS) (col newl evenP (+ (car l) oddS)))))))
+      (else 
+        (evens-only*&co (car l) 
+                        (lambda (newl evenP oddS) 
+                          (evens-only*&co (cdr l) (lambda (nl eP oS) (col (cons newl nl) (* evenP eP) (+ oddS oS))))))))))
+
+(define (show-evens l even-product odd-sum) (list 'evens l 'evens-product even-product 'odds-sum odd-sum))
+(evens-only*&co '((9 1 2 8) 3 10 ((9 9) 7 6) 2) show-evens)
+
+; *********************
+; ***** Chapter 9 *****
+; *********************
+
