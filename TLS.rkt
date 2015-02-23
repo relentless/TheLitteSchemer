@@ -1,5 +1,7 @@
 #lang scheme/base
 
+(require racket/trace)
+
 ; Exercises and practice based on the book The Little Schemer (4th ed)
 
 ; prerequisite fuction definitions
@@ -1123,6 +1125,8 @@
         (evens-only*&co (car l) 
                         (lambda (newl evenP oddS) 
                           (evens-only*&co (cdr l) (lambda (nl eP oS) (col (cons newl nl) (* evenP eP) (+ oddS oS))))))))))
+
+(trace evens-only*&co)
 
 (define (show-evens l even-product odd-sum) (list 'evens l 'evens-product even-product 'odds-sum odd-sum))
 (evens-only*&co '((9 1 2 8) 3 10 ((9 9) 7 6) 2) show-evens)
