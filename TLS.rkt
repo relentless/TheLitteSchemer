@@ -1147,18 +1147,17 @@
                                        (lambda (ncdr) 
                                          (col 
                                           (cond
-                                            ((> ncar ncdr) (add1 ncar))
-                                            (else (add1 ncdr))))))))))))
+                                            ((> (add1 ncar) ncdr) (add1 ncar))
+                                            (else ncdr)))))))))))
                   
 (define (output-depth n) n)
-(trace maxdepth*&co)
-(trace output-depth)
+;(trace maxdepth*&co)
+;(trace output-depth)
 
-;(maxdepth*&co '(1 1 1) output-depth)
-;(maxdepth*&co '((2) 1 1) output-depth)
-(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 3))) output-depth)
-;(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 (4)))) output-depth)
-
+(maxdepth*&co '(1 1 1) output-depth)
+(maxdepth*&co '((2) 1 1) output-depth)
+(maxdepth*&co '(1 1 ((3)) 1) output-depth)
+(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 (4)))) output-depth)                  
 
 ; *********************
 ; ***** Chapter 9 *****
