@@ -1129,7 +1129,36 @@
 (trace evens-only*&co)
 
 (define (show-evens l even-product odd-sum) (list 'evens l 'evens-product even-product 'odds-sum odd-sum))
-(evens-only*&co '((9 1 2 8) 3 10 ((9 9) 7 6) 2) show-evens)
+;(evens-only*&co '((9 1 2 8) 3 10 ((9 9) 7 6) 2) show-evens)
+
+; a different problem to try continuations.  Finds maximum depth of tree in a list.
+(define maxdepth*&co
+  (lambda (l col)
+    (cond
+      ((null? l) (col 1))
+      ((atom? (car l)) 
+        (maxdepth*&co (cdr l)
+                       (lambda (n)
+                         (col n))))
+      (else 
+        (maxdepth*&co (car l)
+                       (lambda (ncar) 
+                         (maxdepth*&co (cdr l) 
+                                       (lambda (ncdr) 
+                                         (col 
+                                          (cond
+                                            ((> ncar ncdr) (add1 ncar))
+                                            (else (add1 ncdr))))))))))))
+                  
+(define (output-depth n) n)
+(trace maxdepth*&co)
+(trace output-depth)
+
+;(maxdepth*&co '(1 1 1) output-depth)
+;(maxdepth*&co '((2) 1 1) output-depth)
+(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 3))) output-depth)
+;(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 (4)))) output-depth)
+
 
 ; *********************
 ; ***** Chapter 9 *****
