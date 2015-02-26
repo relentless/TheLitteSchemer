@@ -1157,7 +1157,29 @@
 (maxdepth*&co '(1 1 1) output-depth)
 (maxdepth*&co '((2) 1 1) output-depth)
 (maxdepth*&co '(1 1 ((3)) 1) output-depth)
-(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 (4)))) output-depth)                  
+(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 (4)))) output-depth) 
+
+; Another go at continuations.  Maintains three lists: divisible by 3, divisible by 5, and others.
+
+(define fizzbuzz*&co
+  (lambda (l col)
+    (cond
+      ((null? l) (col '() 1 0))
+      ((atom? (car l))
+        (cond
+          ((even? (car l)) 
+            (evens-only*&co (cdr l) (lambda (newl evenP oddS) (col (cons (car l) newl) (* (car l) evenP) oddS))))
+          (else 
+            (evens-only*&co (cdr l) (lambda (newl evenP oddS) (col newl evenP (+ (car l) oddS)))))))
+      (else 
+        (evens-only*&co (car l) 
+                        (lambda (newl evenP oddS) 
+                          (evens-only*&co (cdr l) (lambda (nl eP oS) (col (cons newl nl) (* evenP eP) (+ oddS oS))))))))))
+
+(trace evens-only*&co)
+
+(define (show-fizzbuzz 3s 5s rest) (list '3s 3s '5s 5s 'Rest rest))
+(fizzbuzz*&co '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15) show-fizzbuzz)
 
 ; *********************
 ; ***** Chapter 9 *****
