@@ -1154,32 +1154,37 @@
 ;(trace maxdepth*&co)
 ;(trace output-depth)
 
-(maxdepth*&co '(1 1 1) output-depth)
-(maxdepth*&co '((2) 1 1) output-depth)
-(maxdepth*&co '(1 1 ((3)) 1) output-depth)
-(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 (4)))) output-depth) 
+;(maxdepth*&co '(1 1 1) output-depth)
+;(maxdepth*&co '((2) 1 1) output-depth)
+;(maxdepth*&co '(1 1 ((3)) 1) output-depth)
+;(maxdepth*&co '((2 (3 3)) 1 1 (2 (3 (4)))) output-depth) 
 
-; Another go at continuations.  Maintains three lists: divisible by 3, divisible by 5, and others.
+; Another go at continuations.
 
 (define fizzbuzz*&co
   (lambda (l col)
     (cond
-      ((null? l) (col '() 1 0))
+      ((null? l) (col '() '() '() '()))
       ((atom? (car l))
         (cond
-          ((even? (car l)) 
-            (evens-only*&co (cdr l) (lambda (newl evenP oddS) (col (cons (car l) newl) (* (car l) evenP) oddS))))
-          (else 
-            (evens-only*&co (cdr l) (lambda (newl evenP oddS) (col newl evenP (+ (car l) oddS)))))))
+          ((= (modulo (car l) 15) 0) (fizzbuzz*&co (cdr l) (lambda (fizz buzz fizzbuzz rest) (col fizz buzz (cons (car l) fizzbuzz) rest))))
+          ((= (modulo (car l) 3) 0) (fizzbuzz*&co (cdr l) (lambda (fizz buzz fizzbuzz rest) (col (cons (car l) fizz) buzz fizzbuzz rest))))
+          ((= (modulo (car l) 5) 0) (fizzbuzz*&co (cdr l) (lambda (fizz buzz fizzbuzz rest) (col fizz (cons (car l) buzz) fizzbuzz rest))))
+          (else (fizzbuzz*&co (cdr l) (lambda (fizz buzz fizzbuzz rest) (col fizz buzz fizzbuzz (cons (car l) rest)))))))
       (else 
-        (evens-only*&co (car l) 
-                        (lambda (newl evenP oddS) 
-                          (evens-only*&co (cdr l) (lambda (nl eP oS) (col (cons newl nl) (* evenP eP) (+ oddS oS))))))))))
+        (fizzbuzz*&co (car l)
+                      (lambda (carFizz carBuzz carFizzbuzz carRest)
+                        (fizzbuzz*&co (cdr l) (lambda (cdrFizz cdrBuzz cdrFizzbuzz cdrRest)
+                                                (col (append carFizz cdrFizz)
+                                                     (append carBuzz cdrBuzz)
+                                                     (append carFizzbuzz cdrFizzbuzz)
+                                                     (append carRest cdrRest))))))))))
 
-(trace evens-only*&co)
+;(trace fizzbuzz*&co)
 
-(define (show-fizzbuzz 3s 5s rest) (list '3s 3s '5s 5s 'Rest rest))
+(define (show-fizzbuzz fizz buzz fizzbuzz rest) (list 'fizz fizz 'buzz buzz 'fizzbuzz fizzbuzz 'Rest rest))
 (fizzbuzz*&co '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15) show-fizzbuzz)
+(fizzbuzz*&co '((1 (2 3 4) (33 34 35 ((345)) 4 5 (6 (7 (8 9))) 10 (((((111 112 113))))) 12 13 14 15))) show-fizzbuzz)
 
 ; *********************
 ; ***** Chapter 9 *****
