@@ -1215,3 +1215,10 @@
 (define partial
   (lambda (a b)
     (partial b a)))
+
+(define shift
+  (lambda (x)
+    ()))
+
+(shift '((a b) c)) ;(a (b c))
+(shift '((a b) (c d))) ;(a (b (c d)))
