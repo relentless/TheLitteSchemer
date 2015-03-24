@@ -1183,10 +1183,35 @@
 ;(trace fizzbuzz*&co)
 
 (define (show-fizzbuzz fizz buzz fizzbuzz rest) (list 'fizz fizz 'buzz buzz 'fizzbuzz fizzbuzz 'Rest rest))
-(fizzbuzz*&co '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15) show-fizzbuzz)
-(fizzbuzz*&co '((1 (2 3 4) (33 34 35 ((345)) 4 5 (6 (7 (8 9))) 10 (((((111 112 113))))) 12 13 14 15))) show-fizzbuzz)
+;(fizzbuzz*&co '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15) show-fizzbuzz)
+;(fizzbuzz*&co '((1 (2 3 4) (33 34 35 ((345)) 4 5 (6 (7 (8 9))) 10 (((((111 112 113))))) 12 13 14 15))) show-fizzbuzz)
 
 ; *********************
 ; ***** Chapter 9 *****
 ; *********************
 
+(define looking
+  (lambda (a lat)
+    (keep-looking a (pick 1 lat) lat)))
+
+; my initial version
+;(define keep-looking
+;  (lambda (a current lat)
+;    (cond
+;      ((number? current) (keep-looking a (pick current lat) lat))
+;      ((eq? a current) #t)
+;      (else #f))))
+
+; book version
+(define keep-looking
+  (lambda (a sorn lat)
+    (cond
+      ((number? sorn) (keep-looking a (pick sorn lat) lat))
+      (else (eq? a sorn)))))
+
+(looking 'caviar '(6 2 4 caviar 5 7 3))
+(looking 'caviar '(6 2 grits caviar 5 7 3))
+
+(define partial
+  (lambda (a b)
+    (partial b a)))
