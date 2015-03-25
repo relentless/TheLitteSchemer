@@ -1216,9 +1216,20 @@
   (lambda (a b)
     (partial b a)))
 
+; my version
+;(define shift
+;  (lambda (x)
+;    (cons (car (car x))
+;          (cons (cons (car (cdr (car x)))
+;                      (cdr x))
+;                '())))) 
+
+; book version
 (define shift
-  (lambda (x)
-    ()))
+  (lambda (pair)
+    (build (first (first pair))
+           (build (second (first pair))
+                  (second pair)))))
 
 (shift '((a b) c)) ;(a (b c))
 (shift '((a b) (c d))) ;(a (b (c d)))
