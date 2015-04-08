@@ -1209,8 +1209,8 @@
       ((number? sorn) (keep-looking a (pick sorn lat) lat))
       (else (eq? a sorn)))))
 
-(looking 'caviar '(6 2 4 caviar 5 7 3))
-(looking 'caviar '(6 2 grits caviar 5 7 3))
+;(looking 'caviar '(6 2 4 caviar 5 7 3))
+;(looking 'caviar '(6 2 grits caviar 5 7 3))
 
 (define partial
   (lambda (a b)
@@ -1231,5 +1231,39 @@
            (build (second (first pair))
                   (second pair)))))
 
-(shift '((a b) c)) ;(a (b c))
-(shift '((a b) (c d))) ;(a (b (c d)))
+;(shift '((a b) c)) ;(a (b c))
+;(shift '((a b) (c d))) ;(a (b (c d)))
+
+(define align 
+  (lambda (pora)
+    (print pora)
+    (print '())
+    (cond 
+      ((atom? pora) pora)
+      ((pair? (first pora)) (align (shift pora)))
+      (else (build (first pora) (align (second pora)))))))
+
+;(align '(((a b) c) (d (e f))))
+
+(define length*
+  (lambda (pora)
+    (cond
+      ((atom? pora) 1)
+      (else (+ (length* (first pora))
+               (length* (second pora)))))))
+
+;(length* '(((a b) c) (d (e f))))
+
+;(align '((a b) c))
+
+; I don't understand why we would weight the arguments in this way,
+; as the result doesn't equal the number of atoms in arguments to
+; align in any way I can see.
+(define weight* 
+  (lambda (pora) 
+    (cond ((atom? pora) 1)
+          (else (+ 
+                 (* (weight* (first pora)) 2) 
+                 (weight* (second pora)))))))
+
+(weight* '((a b) c))
