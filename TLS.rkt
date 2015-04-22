@@ -1288,3 +1288,33 @@
 
 ;(shuffle '(a (b c)))
 
+(define (eternity x)
+  (eternity x))
+
+; length-0
+(lambda (l) 
+  (cond 
+    ((null? l) 0) 
+    (else (add1 (eternity (cdr l))))))
+
+;length-1
+(
+(lambda (l) 
+  (cond 
+    ((null? l) 0) 
+    (else (add1 ((lambda (l) 
+                   (cond 
+                     ((null? l) 0) 
+                     (else (add1 (eternity (cdr l))))))
+                (cdr l)))))) '(hi))
+
+;my version of a general length, based on what I remember from lambda calculus
+(
+ (lambda (length l)
+   (length length l))
+ (lambda (length l) 
+  (cond 
+    ((null? l) 0) 
+    (else (add1 (length length (cdr l))))))
+ '(1 2 3 4 5 6))
+
