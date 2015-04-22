@@ -1266,4 +1266,25 @@
                  (* (weight* (first pora)) 2) 
                  (weight* (second pora)))))))
 
-(weight* '((a b) c))
+;(weight* '((a b) c))
+
+(define revpair 
+  (lambda (pair) 
+    (build (second pair) 
+           (first pair))))
+
+(define shuffle 
+  (lambda (pora) 
+ ;   (print pora)
+    (cond 
+      ((atom? pora) pora) 
+      ((pair? (first pora)) 
+       ( shuffle ( revpair pora))) 
+      (else (build (first pora) 
+                   ( shuffle (second pora)))))))
+
+; never terminates if two pairs
+; (shuffle '((1 (2 3)) 4))
+
+;(shuffle '(a (b c)))
+
