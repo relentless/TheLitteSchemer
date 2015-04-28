@@ -1297,8 +1297,7 @@
     ((null? l) 0) 
     (else (add1 (eternity (cdr l))))))
 
-;length-1
-(
+; my version of length-1
 (lambda (l) 
   (cond 
     ((null? l) 0) 
@@ -1306,15 +1305,109 @@
                    (cond 
                      ((null? l) 0) 
                      (else (add1 (eternity (cdr l))))))
-                (cdr l)))))) '(hi))
+                (cdr l))))))
 
 ;my version of a general length, based on what I remember from lambda calculus
-(
+;(
  (lambda (length l)
    (length length l))
  (lambda (length l) 
   (cond 
     ((null? l) 0) 
     (else (add1 (length length (cdr l))))))
- '(1 2 3 4 5 6))
+ ;'(1 2 3 4 5 6))
 
+
+; length-0 using abstraction for length function
+((lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l))))))) 
+ eternity) 
+
+; length-1 in the same style
+((lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l)))))))
+ ((lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l)))))))
+  eternity))
+
+; length-2 in the same style
+((lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l)))))))
+ ((lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l)))))))
+  ((lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l)))))))
+   eternity)))
+
+; giving a name to the length-making function
+((lambda (mk-length)
+  (mk-length eternity))
+(lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l))))))))
+
+; length-3 in this style
+((lambda (mk-length)
+   (mk-length
+    (mk-length
+     (mk-length
+      (mk-length eternity)))))
+(lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l))))))))
+
+; using mk-length instead of eternity as the final application
+((lambda (mk-length) 
+   (mk-length mk-length)) 
+ (lambda (mk-length)
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (mk-length (cdr l))))))))
+
+; using mk-length to create an additional recursive use
+((lambda (mk-length) 
+   (mk-length mk-length))
+ (lambda (mk-length)
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 
+              ((mk-length mk-length) 
+               (cdr l))))))))
+
+; with further abstraction to maintain the original length-looking function.
+; Doesn't work because it gets stuck in a loop.
+;((lambda (mk-length) 
+;   (mk-length mk-length)) 
+; (lambda (mk-length) 
+;   ((lambda (length) 
+;      (lambda (l) 
+;        (cond 
+;          ((null? l) 0) 
+;          (else (add1 (length (cdr l))))))) 
+;    (mk-length mk-length))))
+
+; similar thing but replacing mk-length call with a lambda
