@@ -1461,3 +1461,54 @@
 
 ; AKA applicative-order Y combinator
 
+; *********************
+; ***** Chapter 9 *****
+; *********************
+
+; entries
+;'((1 2 3) (1 1 1))
+;'((2) (1))
+;'((hi mum) (1 2))
+
+(define new-entry build)
+
+(new-entry '(hi mum) '(1 1))
+
+(define lookup-in-entry (lambda (name entry entry-f) (lookup-in-entry-help name (first entry) (second entry) entry-f))) 
+
+(define lookup-in-entry-help 
+  (lambda (name names values entry-f) 
+    (cond
+      ((null? names) (entry-f name))
+      ((eq? name (car names)) (car values))
+      (else (lookup-in-entry-help name (cdr names) (cdr values) entry-f))))) 
+
+;(lookup-in-entry 'mum '((hi mum) (1 2)) '())
+;(lookup-in-entry 'hi '((hi mum) (1 2)) '())
+;(lookup-in-entry 'x '((hi mum) (1 2)) (lambda (name) name))
+
+; example table
+;'(((1 2 3) (1 1 1))
+;  ((hi mum) (1 2)))
+
+(define extend-table cons)
+
+;(extend-table
+; '((a b) (x x))
+; '(((1 2 3) (1 1 1))
+;   ((hi mum) (1 2))))
+
+(define (lookup-in-table name table table-f)
+  (cond 
+    ((null? table) (table-f name))
+    (else
+     (lookup-in-entry name 
+                      (car table) 
+                      (lambda (x)
+                        (lookup-in-table name (cdr table) table-f))))))
+
+(lookup-in-table 
+ 'mum 
+ '(((1 2 3) (1 1 1))
+   ((hi mum) (1 2)))
+ (lambda (x) x))
