@@ -1507,8 +1507,18 @@
                       (lambda (x)
                         (lookup-in-table name (cdr table) table-f))))))
 
-(lookup-in-table 
- 'mum 
- '(((1 2 3) (1 1 1))
-   ((hi mum) (1 2)))
- (lambda (x) x))
+;(lookup-in-table 
+; 'mum 
+; '(((1 2 3) (1 1 1))
+;   ((hi mum) (1 2)))
+; (lambda (x) x))
+
+(define expression-to-action 
+  (lambda (e) 
+    (cond 
+      ((atom? e) 
+       (atom-to-action e)) 
+      (else (list-to-action e))))) 
+
+(define (atom-to-action a)
+  ())
