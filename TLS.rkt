@@ -1411,3 +1411,53 @@
 ;    (mk-length mk-length))))
 
 ; similar thing but replacing mk-length call with a lambda
+; then moving the lambda out and passing it in as the 'length' function
+(
+((lambda (mk-length) 
+   (mk-length mk-length))
+ (lambda (mk-length)
+   ((lambda (length)
+     (lambda (l) 
+       (cond 
+         ((null? l) 0) 
+         (else (add1 
+                ((lambda (x) ((mk-length mk-length) x) )
+                 (cdr l)))))))
+    (lambda (x) ((mk-length mk-length) x)))))
+'(1 2 3))
+
+; the length function extracted
+((lambda (le) 
+   ((lambda (mk-length) 
+      (mk-length mk-length)) 
+    (lambda (mk-length) 
+      (le (lambda (x) 
+            ((mk-length mk-length) x)))))) 
+ (lambda (length) 
+   (lambda (l) 
+     (cond 
+       ((null? l) 0) 
+       (else (add1 (length (cdr l)))))))) 
+
+; separate the function that makes 'length' from the function
+; that looks like 'length'
+(define make-recursive 
+  (lambda (le) 
+  ((lambda (mk-length) 
+     (mk-length mk-length)) 
+   (lambda (mk-length) 
+     (le (lambda (x) 
+           ((mk-length mk-length) x)))))))
+
+(define recursive-length
+  (make-recursive
+   (lambda (length) 
+     (lambda (l) 
+       (cond 
+         ((null? l) 0) 
+         (else (add1 (length (cdr l)))))))))
+
+(recursive-length '(1 2 3))
+
+; AKA applicative-order Y combinator
+
