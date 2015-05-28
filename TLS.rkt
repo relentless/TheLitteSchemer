@@ -1472,7 +1472,7 @@
 
 (define new-entry build)
 
-(new-entry '(hi mum) '(1 1))
+;(new-entry '(hi mum) '(1 1))
 
 (define lookup-in-entry (lambda (name entry entry-f) (lookup-in-entry-help name (first entry) (second entry) entry-f))) 
 
@@ -1573,18 +1573,134 @@
 
 (define text-of second)
 
+; my version
+;(define *identifier 
+;  (lambda (e table) 
+;    ((lookup-in-table e table (lambda (name) name)))))
+
+; book version
 (define *identifier 
   (lambda (e table) 
-    ((lookup-in-table e table (lambda (name) name)))))
+    ((lookup-in-table e table initial-table))))
 
-(define *application 
+(define initial-table
+  (lambda (name)
+    (car (quote ()))))
+
+;('non-primitive ((((y z) ((8) 9))) (x) (cons x y)))
+
+(define third (lambda (l) (car (cdr (cdr l)))))
+
+(define table-of first)
+
+(define formals-of second)
+
+(define body-of third)
+
+;(body-of '((((y z) ((8) 9))) (x) (cons x y)))
+
+(define evcon 
+  (lambda (lines table) 
+    (cond 
+      ((else? (question-of (car lines))) (meaning (answer-of (car lines)) table)) 
+      ((meaning (question-of (car lines)) table) (meaning (answer-of (car lines)) table)) 
+      (else ( evcon (cdr lines) table))))) 
+
+; book version checks if this is an atom - imporant?
+(define else?
+  (lambda (e)
+    (cond
+      ((atom? e) (eq? e (quote else)))
+      (else #f))))
+
+;(else? '(else #f))
+;(else? '((eq? 1 2) #f))
+
+(define question-of first)
+
+(define answer-of second)
+
+;(evcon 
+; '((#t 1)
+;   (#f 2)
+;   (else 3))
+; '())
+
+(define *cond
   (lambda (e table) 
-    (text-of e)))
+    (evcon (cdr e) table)))
+
+;(*cond 
+; '(cond 
+;    (coffee klatsch) 
+;    (else party))
+; '(((coffee) (#t)) 
+;   ((klatsch party) (5 (6)))))
 
 (define *lambda 
   (lambda (e table) 
     (text-of e)))
 
-(define *cond
+(define evlis
+  (lambda (args table)
+    (cond
+      ((null? args) '())
+      (else
+         (cons (meaning (first args) table)
+               (evlis (cdr args) table))))))
+
+(define *application 
   (lambda (e table) 
-    (text-of e)))
+    (apply (meaning (function-of e) table) 
+           (evlis (arguments-of e) table)))) 
+
+(define function-of first)
+
+;(function-of '(list 1 2 3))
+
+(define arguments-of cdr)
+
+;(arguments-of '(list 1 2 3))
+
+(define primitive? 
+  (lambda (f)
+    (eq? (first f) (quote primitive))))
+
+(define non-primitive?
+  (lambda (f)
+    (eq? (first f) (quote non-primitive))))
+
+(define apply
+  (lambda (f args)
+    (cond
+      ((primitive? f)
+       (apply-primitive (second f) args)) 
+      ((non-primitive? f) 
+       (apply-closure (second f) args))))) 
+
+(define apply-primitive 
+  (lambda (name vals) 
+    (cond 
+      ((eq? name (quote cons)) (cons (first vals) (second vals))) 
+      ((eq? name (quote car)) (car (first vals))) 
+      ((eq? name (quote cdr)) (cdr (first vals))) 
+      ((eq? name (quote null?)) (null? (first vals))) 
+      ((eq? name (quote eq?)) (eq? (first vals) (second vals))) 
+      ((eq? name (quote atom?)) (atom? (first vals))) 
+      ((eq? name (quote zero?)) (zero? (first vals))) 
+      ((eq? name (quote add1)) ( add1 (first vals))) 
+      ((eq? name (quote sub1)) (sub1 (first vals))) 
+      ((eq? name (quote number?)) (number? (first vals))))))
+
+(define apply-closure
+  (lambda (np args)
+    (meaning 
+     (body-of np)
+     (extend-table
+      (table-of np)
+      (new-entry (formals-of np) args)))))
+      
+
+      ; new-entry
+      ; initial-table
+      ; extend-table
