@@ -1474,7 +1474,9 @@
 
 ;(new-entry '(hi mum) '(1 1))
 
-(define lookup-in-entry (lambda (name entry entry-f) (lookup-in-entry-help name (first entry) (second entry) entry-f))) 
+(define lookup-in-entry 
+  (lambda (name entry entry-f)
+    (lookup-in-entry-help name (first entry) (second entry) entry-f))) 
 
 (define lookup-in-entry-help 
   (lambda (name names values entry-f) 
@@ -1581,7 +1583,7 @@
 ; book version
 (define *identifier 
   (lambda (e table) 
-    ((lookup-in-table e table initial-table))))
+    (lookup-in-table e table initial-table)))
 
 (define initial-table
   (lambda (name)
@@ -1646,7 +1648,7 @@
     (cond
       ((null? args) '())
       (else
-         (cons (meaning (first args) table)
+         (cons (meaning (car args) table)
                (evlis (cdr args) table))))))
 
 (define *application 
@@ -1697,10 +1699,16 @@
     (meaning 
      (body-of np)
      (extend-table
-      (table-of np)
-      (new-entry (formals-of np) args)))))
+      (new-entry (formals-of np) args)
+      (table-of np)))))
+    
       
+(apply-closure
+ '(() (x y) (cons x y))
+ '(1 (2)))
 
-      ; new-entry
-      ; initial-table
-      ; extend-table
+(apply-closure
+ '((((u v w) (1 2 3)) ((x y z) (4 5 6))) (x y) (cons z x))
+ '((a b c) (d e f)))
+
+; w00t!
